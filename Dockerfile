@@ -1,3 +1,6 @@
+#The basics are based upon Kaggle/python docker image
+
+
 #Base image that supplies us with an anaconda3 installation (and jupyteR)
 FROM continuumio/anaconda3:5.0.1
 
@@ -5,12 +8,12 @@ FROM continuumio/anaconda3:5.0.1
     # as described by Lionel Chan at http://stackoverflow.com/a/37426929/5881346
 RUN sed -i "s/httpredir.debian.org/debian.uchicago.edu/" /etc/apt/sources.list && \
     apt-get update && apt-get install -y build-essential && \
+	apt-get install -y apt-utils && \
     # https://stackoverflow.com/a/46498173
     conda update -y conda && conda update -y python
 	
 RUN apt-get install -y libfreetype6-dev && \
     apt-get install -y libglib2.0-0 libxext6 libsm6 libxrender1 libfontconfig1 --fix-missing && \
-	apt-get install -y msttcorefonts -qq && \
 	#keras
     cd /usr/local/src && \
 	mkdir keras && cd keras && \
@@ -53,6 +56,7 @@ RUN pip install --upgrade mpld3 && \
 	# Update setuptools and add tensorpack
     pip install --upgrade --ignore-installed setuptools && pip install --no-cache-dir git+git://github.com/ppwwyyxx/tensorpack && \
 	pip install pandas-datareader && \
+	pip install python3-matplotlib && \
 	# clean up pip cache
     rm -rf /root/.cache/pip/*
 	
