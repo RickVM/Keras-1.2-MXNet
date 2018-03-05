@@ -10,6 +10,7 @@ RUN sed -i "s/httpredir.debian.org/debian.uchicago.edu/" /etc/apt/sources.list &
 	
 RUN apt-get install -y libfreetype6-dev && \
     apt-get install -y libglib2.0-0 libxext6 libsm6 libxrender1 libfontconfig1 --fix-missing && \
+	apt-get install -y msttcorefonts -qq && \
 	#keras
     cd /usr/local/src && \
 	mkdir keras && cd keras && \
@@ -42,6 +43,10 @@ RUN apt-get update && \
     cd scikit-learn && python setup.py build && python setup.py install
 	
 RUN pip install --upgrade mpld3 && \
+	pip install pandas && \
+	pip install ipython && \
+	pip install ipykernel && \
+	python3 -m ipykernel.kernelspec && \
 	pip install pandas-profiling && \
     pip install git+https://github.com/hyperopt/hyperopt.git && \
 	pip install sklearn-pandas && \
@@ -59,3 +64,19 @@ RUN pip install --upgrade mpld3 && \
 	
 # Set backend for matplotlib
 ENV MPLBACKEND "agg"
+
+# only password authentication (password: keras)
+#ENV PASSWD='sha1:98b767162d34:8da1bc3c75a0f29145769edc977375a373407824'
+#unset ENV TOKEN=
+# password and token authentication (password and token: keras)
+ENV PASSWD='sha1:98b767162d34:8da1bc3c75a0f29145769edc977375a373407824'
+ENV TOKEN='keras'
+CMD /bin/bash -c 'jupyter notebook \
+    --NotebookApp.open_browser=False \
+    --NotebookApp.allow_root=True \
+    --NotebookApp.ip="$IP" \
+    ${PASSWD+--NotebookApp.password=\"$PASSWD\"} \
+    ${TOKEN+--NotebookApp.token=\"$TOKEN\"} \
+    --NotebookApp.allow_password_change=False \
+    --JupyterWebsocketPersonality.list_kernels=True \
+    "$@"'
